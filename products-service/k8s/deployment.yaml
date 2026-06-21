@@ -25,14 +25,14 @@ spec:
           # Probe de "vivo": si falla, Kubernetes reinicia el contenedor.
           livenessProbe:
             httpGet:
-              path: /health
+              path: /live
               port: 8001
             initialDelaySeconds: 5
             periodSeconds: 10
           # Probe de "listo": si falla, no recibe tráfico desde el Service.
           readinessProbe:
             httpGet:
-              path: /health
+              path: /ready
               port: 8001
             initialDelaySeconds: 3
             periodSeconds: 5

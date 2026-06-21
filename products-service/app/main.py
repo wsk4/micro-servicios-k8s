@@ -11,6 +11,11 @@ el precio y el nombre de un producto antes de crear un pedido.
 """
 from fastapi import FastAPI, HTTPException
 
+import time
+import psutil
+
+INICIO = time.time()
+
 app = FastAPI(
     title="Products Service",
     description="Catálogo de productos de la tienda (Módulo 3 - ISY1101)",
@@ -31,6 +36,22 @@ def health():
     """Endpoint de salud usado por las probes de Kubernetes y docker-compose."""
     return {"status": "ok", "service": "products-service"}
 
+@app.get("/live")
+def live():
+    """
+    Liveness: el proceso esta vivo y respondiendo. NO depende de nadie externo.
+    Devolvemos OK y desde hace cuantos segundos esta arriba (uptime).
+    """
+    return {"alive": True, "uptime_segundos": round(time.time() - INICIO, 1)}
+
+
+@app.get("/ready")
+def ready():
+    """Readiness: listo solo si NO esta saturado de memoria (uso real con psutil)."""
+    memoria_usada = psutil.virtual_memory().percent
+    if memoria_usada > 90:
+        raise HTTPException(status_code=503, detail={"ready": False, "memoria_%": memoria_usada})
+    return {"ready": True, "memoria_%": memoria_usada, "service": "products-service"}
 
 @app.get("/products")
 def list_products():
