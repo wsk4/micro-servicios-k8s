@@ -27,6 +27,7 @@ import time
 import psutil
 
 INICIO=time.time()
+READY_MAX_MEM_PERCENT = float(os.getenv("READY_MAX_MEM_PERCENT", "90"))
 
 app = FastAPI(
     title="Orders Service",
